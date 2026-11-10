@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文字におきかえ練習ノート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF9F2;
+    --ink:#263A5C;
+    --ink-soft:#5A6B8C;
+    --rule:#C9D5E8;
+    --margin:#E2897E;
+    --card:#FFFFFF;
+    --correct:#2F9E8F;
+    --correct-bg:#E4F6F2;
+    --incorrect:#D8635A;
+    --incorrect-bg:#FBE7E4;
+    --amber:#D99A2B;
+    --amber-bg:#FBF0DA;
+    --shadow: 0 2px 0 rgba(38,58,92,0.06), 0 8px 24px rgba(38,58,92,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    color:var(--ink);
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 37px,
+        var(--rule) 37px, var(--rule) 38px
+      ),
+      var(--paper);
+    min-height:100vh;
+    padding: 28px 16px 60px;
+  }
+  .page{
+    max-width:640px;
+    margin:0 auto;
+    position:relative;
+    padding-left:34px;
+  }
+  .margin-line{
+    position:absolute;
+    left:18px;
+    top:0;
+    bottom:0;
+    width:2px;
+    background:var(--margin);
+    opacity:0.55;
+    border-radius:2px;
+  }
+  header{
+    padding: 6px 0 22px;
+  }
+  h1{
+    font-family:'Yuji Syuku', serif;
+    font-size:clamp(26px,5vw,34px);
+    margin:0 0 4px;
+    letter-spacing:.02em;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:14px;
+    line-height:1.7;
+  }
+  .progress-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:18px 0 22px;
+  }
+  .progress-track{
+    flex:1;
+    height:8px;
+    background:#E7EAF2;
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--amber), var(--correct));
+    border-radius:99px;
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label{
+    font-size:12px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:24px 22px 22px;
+    margin-bottom:16px;
+    animation:slideIn .35s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes slideIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .problem-tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:var(--amber);
+    background:var(--amber-bg);
+    padding:3px 10px;
+    border-radius:99px;
+    margin-bottom:12px;
+  }
+  .problem-text{
+    font-size:16.5px;
+    line-height:1.85;
+    margin:0 0 20px;
+  }
+  .problem-text .num{
+    font-weight:700;
+    color:var(--ink);
+  }
+  .step{
+    border-top:1px dashed var(--rule);
+    padding-top:16px;
+    margin-top:16px;
+  }
+  .step:first-of-type{border-top:none; padding-top:0; margin-top:0;}
+  .step-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .step-badge{
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--ink);
+    color:#fff;
+    font-size:11px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .step.locked{
+    opacity:0.35;
+    pointer-events:none;
+  }
+  .box-visual{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Yuji Syuku', serif;
+    font-size:15px;
+    background:var(--amber-bg);
+    border:1.5px dashed var(--amber);
+    color:#8a611a;
+    padding:6px 12px;
+    border-radius:8px;
+    margin-bottom:14px;
+  }
+  .box-visual .x{
+    font-family:'Zen Kaku Gothic New',sans-serif;
+    font-weight:900;
+    font-size:16px;
+    color:var(--amber);
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .option-btn{
+    text-align:left;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1.5px solid var(--rule);
+    background:#fff;
+    font-size:14.5px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s, opacity .15s;
+    font-family:inherit;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .option-btn:hover{border-color:var(--ink-soft);}
+  .option-btn:active{transform:scale(.99);}
+  .option-btn .check-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:18px;height:18px;
+    border-radius:50%;
+    font-size:11px;
+    font-weight:900;
+    flex-shrink:0;
+    opacity:0;
+    transform:scale(.5);
+    transition:opacity .15s, transform .15s;
+  }
+  .option-btn.picked{
+    border-color:var(--amber);
+    background:var(--amber-bg);
+    color:#8a611a;
+    font-weight:700;
+    box-shadow:0 0 0 3px rgba(217,154,43,0.18);
+    animation:pickPop .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .option-btn.picked .check-badge{
+    opacity:1;
+    transform:scale(1);
+    background:var(--amber);
+    color:#fff;
+  }
+  @keyframes pickPop{
+    0%{transform:scale(.97);}
+    60%{transform:scale(1.015);}
+    100%{transform:scale(1);}
+  }
+  .option-btn.selected-correct{
+    border-color:var(--correct);
+    background:var(--correct-bg);
+    color:#1c6e63;
+    font-weight:700;
+    box-shadow:none;
+  }
+  .option-btn.selected-correct .check-badge{
+    opacity:1; transform:scale(1);
+    background:var(--correct); color:#fff;
+  }
+  .option-btn.selected-wrong{
+    border-color:var(--incorrect);
+    background:var(--incorrect-bg);
+    color:#a8362d;
+    font-weight:700;
+    box-shadow:none;
+  }
+  .option-btn.selected-wrong .check-badge{
+    opacity:1; transform:scale(1);
+    background:var(--incorrect); color:#fff;
+  }
+  .option-btn.reveal-correct{
+    border-color:var(--correct);
+    background:var(--correct-bg);
+    color:#1c6e63;
+  }
+  .option-btn:disabled{cursor:default;}
+  .option-btn:disabled:not(.picked):not(.selected-correct):not(.selected-wrong):not(.reveal-correct){
+    opacity:0.4;
+  }
+  .expr-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .expr-input{
+    flex:1;
+    font-size:16px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    padding:11px 14px;
+    border-radius:10px;
+    border:1.5px solid var(--rule);
+    outline:none;
+    background:#fff;
+    color:var(--ink);
+  }
+  .expr-input:focus{border-color:var(--amber); box-shadow:0 0 0 3px var(--amber-bg);}
+  .expr-input.right{border-color:var(--correct); background:var(--correct-bg);}
+  .expr-input.wrong{border-color:var(--incorrect); background:var(--incorrect-bg);}
+  .submit-btn{
+    padding:11px 18px;
+    border-radius:10px;
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    font-family:inherit;
+    white-space:nowrap;
+  }
+  .submit-btn:hover{background:#1a2a45;}
+  .submit-btn:disabled{background:#B7C0D1; cursor:not-allowed;}
+  .hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:8px;
+    line-height:1.6;
+  }
+  .feedback{
+    margin-top:14px;
+    padding:14px 16px;
+    border-radius:10px;
+    font-size:14px;
+    line-height:1.8;
+    display:none;
+  }
+  .feedback.show{display:block; animation:slideIn .3s;}
+  .feedback.good{background:var(--correct-bg); color:#1c6e63;}
+  .feedback.bad{background:var(--incorrect-bg); color:#a8362d;}
+  .feedback .expl-title{font-weight:700; margin-bottom:4px; display:block;}
+  .footer-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:18px;
+  }
+  .next-btn{
+    padding:11px 22px;
+    border-radius:10px;
+    border:none;
+    background:var(--correct);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    font-family:inherit;
+    display:none;
+  }
+  .next-btn.show{display:inline-flex; align-items:center; gap:6px;}
+  .next-btn:hover{background:#268577;}
+  /* result screen */
+  .result-card{
+    text-align:center;
+    padding:36px 22px;
+  }
+  .result-score{
+    font-family:'Yuji Syuku', serif;
+    font-size:44px;
+    color:var(--ink);
+    margin:6px 0 2px;
+  }
+  .result-score span{color:var(--correct);}
+  .result-msg{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    margin-bottom:22px;
+    line-height:1.7;
+  }
+  .retry-btn{
+    padding:12px 26px;
+    border-radius:10px;
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .retry-btn:hover{background:#1a2a45;}
+  .hidden{display:none !important;}
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .tab-btn{
+    flex:1;
+    padding:11px 10px;
+    border-radius:10px;
+    border:1.5px solid var(--rule);
+    background:#fff;
+    color:var(--ink-soft);
+    font-weight:700;
+    font-size:13.5px;
+    font-family:inherit;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .tab-btn:hover{border-color:var(--ink-soft);}
+  .tab-btn.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fff;
+  }
+  .var-groups{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .var-group-title{
+    font-family:'Yuji Syuku', serif;
+    font-size:15px;
+    color:var(--amber);
+    margin-bottom:8px;
+  }
+  .var-group.locked{opacity:0.35; pointer-events:none;}
+  .cond-block{
+    background:var(--paper);
+    border-left:3px solid var(--amber);
+    padding:10px 12px;
+    border-radius:0 8px 8px 0;
+    font-size:14px;
+    line-height:1.7;
+    margin-bottom:12px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card, .feedback{animation:none !important;}
+  }
+  @media (max-width:480px){
+    .expr-row{flex-direction:column; align-items:stretch;}
+    .submit-btn{width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="margin-line"></div>
+  <header>
+    <h1>文字におきかえ練習ノート</h1>
+    <div class="sub" id="subText">文章題を読んで、①何を <b>x</b> とするか決める → ②<b>x</b> を使って式に表す。2段階で練習しよう。</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabSingle">文字を1つおく練習</button>
+    <button class="tab-btn" id="tabSystem">連立方程式を立てる練習</button>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">1 / 8</div>
+  </div>
+
+  <div id="quizArea"></div>
+
+  <div id="resultArea" class="card result-card hidden">
+    <div class="problem-tag">RESULT</div>
+    <div class="result-score" id="resultScore">0<span>/8</span></div>
+    <div class="result-msg" id="resultMsg"></div>
+    <button class="retry-btn" id="retryBtn">もう一度やる</button>
+  </div>
+</div>
+
+<script>
+const problems = [
+  {
+    tag: "だい金と個数",
+    text: "1本 <span class='num'>120円</span> のジュースを何本か買う。買う本数がわからないので、これを文字でおきたい。",
+    boxLabel: "買う本数",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["ジュース1本のねだん","買う本数","支払う代金の合計"],
+    correctIndex: 1,
+    exprQ: "ジュースを x 本買ったときの、代金の合計を x を使って表しなさい。（単位:円）",
+    accepted: ["120x","120*x","x*120"],
+    explanation: "求めたいのは「代金の合計」ですが、まだ分かっていない量は「本数」です。本数を x とおくと、代金は 単価×本数 なので 120x（円）となります。"
+  },
+  {
+    tag: "年齢",
+    text: "兄と弟がいる。弟は兄より <span class='num'>3歳</span> 年下である。兄の年齢がわからない。",
+    boxLabel: "兄の年齢",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["弟の年齢","兄の年齢","2人の年齢の合計"],
+    correctIndex: 1,
+    exprQ: "兄の年齢を x 歳としたとき、弟の年齢を x を使って表しなさい。（単位:歳）",
+    accepted: ["x-3"],
+    explanation: "分かっていない出発点は「兄の年齢」なのでこれを x とおきます。弟は兄より3歳年下なので、弟の年齢は x-3（歳）です。"
+  },
+  {
+    tag: "図形",
+    text: "正方形の花だんがある。1辺の長さがわからないので、これを文字でおいて周りの長さを表したい。",
+    boxLabel: "1辺の長さ",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["正方形の1辺の長さ","正方形の面積","周りの長さ"],
+    correctIndex: 0,
+    exprQ: "1辺の長さを x cm としたとき、正方形の周りの長さを x を使って表しなさい。（単位:cm）",
+    accepted: ["4x","x*4"],
+    explanation: "周りの長さを求めるためには、まず基本になる量である「1辺の長さ」を x とおくのが自然です。正方形の周りの長さは 1辺×4 なので 4x（cm）です。"
+  },
+  {
+    tag: "速さ・道のり",
+    text: "分速70mで歩く人がいる。歩いた時間がわからないので、これを文字でおいて道のりを表したい。",
+    boxLabel: "歩いた時間",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["歩く速さ","歩いた時間","歩いた道のり"],
+    correctIndex: 1,
+    exprQ: "歩いた時間を x 分としたとき、進んだ道のりを x を使って表しなさい。（単位:m）",
+    accepted: ["70x","70*x","x*70"],
+    explanation: "求めたいのは「道のり」ですが、分かっていないのは「時間」です。時間を x とおくと、道のり=速さ×時間 より 70x（m）となります。"
+  },
+  {
+    tag: "過不足（配る）",
+    text: "えんぴつが何本かある。何人かの子どもに1人 <span class='num'>5本</span> ずつ配ると、<span class='num'>3本</span> 余る。子どもの人数がわからない。",
+    boxLabel: "子どもの人数",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["えんぴつの本数","子どもの人数","余った本数"],
+    correctIndex: 1,
+    exprQ: "子どもの人数を x 人としたとき、えんぴつの本数を x を使って表しなさい。（単位:本）",
+    accepted: ["5x+3","5*x+3","3+5x","3+5*x"],
+    explanation: "「本数」を求めたいですが、それは「人数」によって決まります。人数を x とおくと、配った本数は 5x、余りが3本あるので、全体の本数は 5x+3（本）です。"
+  },
+  {
+    tag: "割引",
+    text: "ある品物の定価がわからない。この品物を2割引きで買うときの代金を、文字を使って表したい。",
+    boxLabel: "定価",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["品物の定価","割引される金額","支払う代金"],
+    correctIndex: 0,
+    exprQ: "定価を x 円としたとき、2割引きで買うときの代金を x を使って表しなさい。（単位:円）",
+    accepted: ["0.8x","0.8*x","x*0.8","x-0.2x","x-0.2*x"],
+    explanation: "求めたいのは「代金」ですが、その基準になるのは「定価」です。定価を x とおくと、2割引き＝定価の80%なので、代金は 0.8x（円）です。"
+  },
+  {
+    tag: "過不足（集金）",
+    text: "文化祭の費用を集めている。1人 <span class='num'>500円</span> ずつ集めることは決まっているが、集める人数がわからない。人数分集めると、必要な金額より <span class='num'>2000円</span> 多く集まる。",
+    boxLabel: "集める人数",
+    chooseQ: "何を x とするのがよいですか。",
+    options: ["1人あたりの金額","集める人数","余分に集まる金額"],
+    correctIndex: 1,
+    exprQ: "集める人数を x 人としたとき、集まる金額の合計を x を使って表しなさい。（単位:円）",
+    accepted: ["500x","500*x","x*500"],
+    explanation: "求めたいのは「集まる金額」ですが、まだ分かっていないのは「人数」です。人数を x とおくと、集まる金額は 1人分×人数 なので 500x（円）です。"
+  },
+  {
+    tag: "速さ（逆算）",
+    text: "ある人が x km の道のりを2時間で走った。この人の時速を、道のり x を使って表したい。",
+    boxLabel: "道のり（すでにxで表されている）",
+    chooseQ: "この問題ではすでに何が x とされていますか。",
+    options: ["走った時間","走った道のり","時速"],
+    correctIndex: 1,
+    exprQ: "この人の時速を、x を使って表しなさい。（単位:km/時）",
+    accepted: ["x/2"],
+    explanation: "この問題では道のりがすでに x km と与えられています。時速＝道のり÷時間 なので、時速は x/2（km/時）です。文字を『どうおくか』だけでなく、『すでにおかれた文字をどう使うか』を読み取る練習です。"
+  }
+];
+
+const systemProblems = [
+  {
+    tag: "代金(2種類)",
+    text: "ノート1冊の値段と、消しゴム1個の値段がわからない。ノート3冊と消しゴム2個を買うと650円、ノート2冊と消しゴム5個を買うと700円だった。",
+    optionsX: ["ノート1冊の値段","消しゴム1個の値段","代金の合計"],
+    correctXIndex: 0,
+    optionsY: ["ノート1冊の値段","消しゴム1個の値段","代金の合計"],
+    correctYIndex: 1,
+    cond1Text: "ノート3冊と消しゴム2個で650円 になることを式に表しなさい。",
+    cond1Accepted: ["3x+2y=650"],
+    cond2Text: "ノート2冊と消しゴム5個で700円 になることを式に表しなさい。",
+    cond2Accepted: ["2x+5y=700"],
+    explanation: "「値段が分からない2つの量」を x, y とおき、それぞれの買い方の条件をそのまま「合計＝金額」の式にします。"
+  },
+  {
+    tag: "年齢",
+    text: "父と子の年齢の和は72歳である。また、父の年齢は子の年齢の3倍より6歳大きい。父と子の年齢はそれぞれわからない。",
+    optionsX: ["父の年齢","子の年齢","2人の年齢の差"],
+    correctXIndex: 0,
+    optionsY: ["父の年齢","子の年齢","2人の年齢の差"],
+    correctYIndex: 1,
+    cond1Text: "父と子の年齢の和が72歳であることを式に表しなさい。",
+    cond1Accepted: ["x+y=72"],
+    cond2Text: "父の年齢が子の年齢の3倍より6歳大きいことを式に表しなさい。",
+    cond2Accepted: ["x=3y+6","3y+6=x"],
+    explanation: "分からない2つの年齢を x, y とおきます。「和が72」はそのまま x+y=72。「3倍より6大きい」は 3y+6 を x に等しいとして表します。"
+  },
+  {
+    tag: "入場料",
+    text: "ある施設の大人1人の入場料と、子供1人の入場料がわからない。大人3人と子供2人で入場すると合計2600円、大人1人と子供4人で入場すると合計2200円だった。",
+    optionsX: ["大人1人の入場料","子供1人の入場料","入場した人数"],
+    correctXIndex: 0,
+    optionsY: ["大人1人の入場料","子供1人の入場料","入場した人数"],
+    correctYIndex: 1,
+    cond1Text: "大人3人・子供2人で合計2600円になることを式に表しなさい。",
+    cond1Accepted: ["3x+2y=2600"],
+    cond2Text: "大人1人・子供4人で合計2200円になることを式に表しなさい。",
+    cond2Accepted: ["x+4y=2200"],
+    explanation: "入場料という「値段」が分からないので、大人・子供それぞれの入場料を x, y とおき、人数×値段の合計を式にします。"
+  },
+  {
+    tag: "速さ(流水算)",
+    text: "船の静水時の速さと、川の流れの速さがわからない。この船で川を12kmさかのぼるのに2時間、12km下るのに1時間かかった。",
+    optionsX: ["船の静水時の速さ","川の流れの速さ","進んだ道のり"],
+    correctXIndex: 0,
+    optionsY: ["船の静水時の速さ","川の流れの速さ","進んだ道のり"],
+    correctYIndex: 1,
+    cond1Text: "上りの速さは (x-y) で表せる。12kmを2時間でさかのぼったことを式に表しなさい。",
+    cond1Accepted: ["2*(x-y)=12","(x-y)*2=12","2x-2y=12"],
+    cond2Text: "下りの速さは (x+y) で表せる。12kmを1時間で下ったことを式に表しなさい。",
+    cond2Accepted: ["1*(x+y)=12","(x+y)*1=12","x+y=12"],
+    explanation: "静水時の速さと流れの速さという「速さの分からない2つの量」を x, y とおきます。上りは遅くなるので x-y、下りは速くなるので x+y。それぞれ「速さ×時間＝道のり」の式にします。"
+  },
+  {
+    tag: "割合(増減)",
+    text: "ある学校の昨年度の生徒数は男女合わせて500人だった。今年度は男子が10%増え、女子が5%減った結果、全体で15人増えた。昨年度の男子・女子の人数はそれぞれわからない。",
+    optionsX: ["昨年度の男子の人数","昨年度の女子の人数","今年度の生徒数"],
+    correctXIndex: 0,
+    optionsY: ["昨年度の男子の人数","昨年度の女子の人数","今年度の生徒数"],
+    correctYIndex: 1,
+    cond1Text: "昨年度の男女合わせた人数が500人であることを式に表しなさい。",
+    cond1Accepted: ["x+y=500"],
+    cond2Text: "今年度、男子が10%増え、女子が5%減った結果、全体で15人増えたことを式に表しなさい。",
+    cond2Accepted: ["0.1x-0.05y=15","0.1*x-0.05*y=15"],
+    explanation: "昨年度の男子・女子の人数を x, y とおきます。増えた分は 0.1x、減った分は 0.05y で、その差し引きが増加分の15人に等しくなります。"
+  },
+  {
+    tag: "個数と代金",
+    text: "1個150円のりんごと1個100円のみかんを合わせて20個買い、代金の合計が2500円になった。りんごとみかんの個数はそれぞれわからない。",
+    optionsX: ["りんごの個数","みかんの個数","代金の合計"],
+    correctXIndex: 0,
+    optionsY: ["りんごの個数","みかんの個数","代金の合計"],
+    correctYIndex: 1,
+    cond1Text: "りんごとみかんを合わせて20個買ったことを式に表しなさい。",
+    cond1Accepted: ["x+y=20"],
+    cond2Text: "代金の合計が2500円になったことを式に表しなさい。",
+    cond2Accepted: ["150x+100y=2500"],
+    explanation: "個数が分からない2種類の品物を x, y とおきます。「合わせて20個」は個数の式、「代金の合計」は 単価×個数 の和が2500円になる式です。"
+  }
+];
+
+let mode = 'single'; // 'single' or 'system'
+let current = 0;
+let score = 0;
+let chosenOption = null;
+let stepOneCorrect = false;
+
+// system-mode state
+let sysStep = 1; // 1: choose x/y, 2: cond1, 3: cond2
+let sysChosenX = null;
+let sysChosenY = null;
+let sysXYCorrect = false;
+let sysCond1Correct = false;
+let sysOrientation = 'normal'; // 'normal' or 'swapped' (x/y assigned in reverse of the textbook default)
+
+function swapVars(expr){
+  return expr.replace(/[xy]/gi, ch => ch.toLowerCase() === 'x' ? 'y' : 'x');
+}
+function acceptedForOrientation(list){
+  return sysOrientation === 'swapped' ? list.map(swapVars) : list;
+}
+
+const quizArea = document.getElementById('quizArea');
+const resultArea = document.getElementById('resultArea');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const subText = document.getElementById('subText');
+const tabSingle = document.getElementById('tabSingle');
+const tabSystem = document.getElementById('tabSystem');
+
+function activeList(){
+  return mode === 'single' ? problems : systemProblems;
+}
+
+function updateProgress(){
+  const list = activeList();
+  const pct = Math.round((current/list.length)*100);
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = `${current+1} / ${list.length}`;
+}
+
+function switchMode(newMode){
+  if(mode === newMode) return;
+  mode = newMode;
+  current = 0;
+  score = 0;
+  resultArea.classList.add('hidden');
+  if(mode === 'single'){
+    tabSingle.classList.add('active');
+    tabSystem.classList.remove('active');
+    subText.innerHTML = "文章題を読んで、①何を <b>x</b> とするか決める → ②<b>x</b> を使って式に表す。2段階で練習しよう。";
+    renderProblem();
+  }else{
+    tabSingle.classList.remove('active');
+    tabSystem.classList.add('active');
+    subText.innerHTML = "文章題を読んで、①何を <b>x</b>・<b>y</b> とするか決める → ②2つの条件をそれぞれ式に表す。連立方程式を立てる練習。";
+    renderProblem2();
+  }
+}
+tabSingle.addEventListener('click', ()=>switchMode('single'));
+tabSystem.addEventListener('click', ()=>switchMode('system'));
+
+function normalizeExpr(str){
+  let s = str.trim();
+  s = s.replace(/×/g,'*').replace(/÷/g,'/').replace(/[Ｘｘ]/g,'x');
+  s = s.replace(/\s+/g,'');
+  // insert explicit * between a digit/paren and x, or x and digit/paren, or paren-paren
+  s = s.replace(/(\d)(x)/gi, '$1*$2');
+  s = s.replace(/(x)(\d)/gi, '$1*$2');
+  s = s.replace(/(\d|x|\))(\()/gi, '$1*$2');
+  s = s.replace(/(\))(\d|x)/gi, '$1*$2');
+  return s;
+}
+
+function evalExprAt(expr, xVal){
+  try{
+    const norm = normalizeExpr(expr);
+    // only allow safe characters
+    if(!/^[0-9x+\-*/.() ]+$/i.test(norm)) return null;
+    const fn = new Function('x', 'return (' + norm.replace(/x/gi,'x') + ');');
+    const v = fn(xVal);
+    if(typeof v !== 'number' || !isFinite(v)) return null;
+    return v;
+  }catch(e){
+    return null;
+  }
+}
+
+function isExprEquivalent(userInput, acceptedList){
+  const testVals = [2, 5, 11.5];
+  for(const accepted of acceptedList){
+    let allMatch = true;
+    for(const t of testVals){
+      const uv = evalExprAt(userInput, t);
+      const av = evalExprAt(accepted, t);
+      if(uv === null || av === null || Math.abs(uv - av) > 1e-6){
+        allMatch = false;
+        break;
+      }
+    }
+    if(allMatch) return true;
+  }
+  return false;
+}
+
+function normalizeExpr2(str){
+  let s = str.trim();
+  s = s.replace(/×/g,'*').replace(/÷/g,'/').replace(/[Ｘｘ]/g,'x').replace(/[Ｙｙ]/g,'y');
+  s = s.replace(/\s+/g,'');
+  s = s.replace(/(\d)([xy])/gi, '$1*$2');
+  s = s.replace(/([xy])(\d)/gi, '$1*$2');
+  s = s.replace(/(x)(y)/gi, '$1*$2');
+  s = s.replace(/(\d|x|y|\))(\()/gi, '$1*$2');
+  s = s.replace(/(\))(\d|x|y)/gi, '$1*$2');
+  return s;
+}
+
+function evalExprAt2(expr, xVal, yVal){
+  try{
+    const norm = normalizeExpr2(expr);
+    if(!/^[0-9xy+\-*/.() ]+$/i.test(norm)) return null;
+    const fn = new Function('x','y', 'return (' + norm + ');');
+    const v = fn(xVal, yVal);
+    if(typeof v !== 'number' || !isFinite(v)) return null;
+    return v;
+  }catch(e){
+    return null;
+  }
+}
+
+function equationDiff(eqStr, xVal, yVal){
+  const parts = eqStr.split('=');
+  if(parts.length !== 2) return null;
+  const l = evalExprAt2(parts[0], xVal, yVal);
+  const r = evalExprAt2(parts[1], xVal, yVal);
+  if(l === null || r === null) return null;
+  return l - r;
+}
+
+function isEquationEquivalent(userInput, acceptedList){
+  if(!userInput.includes('=')) return false;
+  const pts = [[1,1],[2,5],[7,-3]];
+  for(const accepted of acceptedList){
+    let ratios = [];
+    let valid = true;
+    for(const [xv,yv] of pts){
+      const ud = equationDiff(userInput, xv, yv);
+      const ad = equationDiff(accepted, xv, yv);
+      if(ud === null || ad === null){ valid = false; break; }
+      if(Math.abs(ad) < 1e-9){
+        if(Math.abs(ud) > 1e-6){ valid = false; break; }
+        continue;
+      }
+      ratios.push(ud/ad);
+    }
+    if(!valid || ratios.length === 0) continue;
+    const k0 = ratios[0];
+    if(Math.abs(k0) < 1e-9) continue;
+    const consistent = ratios.every(k=>Math.abs(k-k0) < 1e-6);
+    if(consistent) return true;
+  }
+  return false;
+}
+
+function renderProblem(){
+  const p = problems[current];
+  chosenOption = null;
+  stepOneCorrect = false;
+  updateProgress();
+
+  quizArea.innerHTML = `
+    <div class="card">
+      <span class="problem-tag">${p.tag}</span>
+      <p class="problem-text">${p.text}</p>
+
+      <div class="step" id="step1">
+        <div class="step-label"><span class="step-badge">1</span> ${p.chooseQ}</div>
+        <div class="options" id="optionsWrap">
+          ${p.options.map((opt,i)=>`<button class="option-btn" data-index="${i}"><span>${opt}</span><span class="check-badge">✓</span></button>`).join('')}
+        </div>
+        <div class="feedback" id="fb1"></div>
+      </div>
+
+      <div class="step locked" id="step2">
+        <div class="step-label"><span class="step-badge">2</span> 式に表す</div>
+        <div class="box-visual"><span class="x">x</span> = ${p.boxLabel}</div>
+        <p class="problem-text" style="margin-bottom:14px;">${p.exprQ}</p>
+        <div class="expr-row">
+          <input type="text" class="expr-input" id="exprInput" placeholder="例: 120x" ${p.text.includes('x') ? '' : ''}>
+          <button class="submit-btn" id="submitExpr">答え合わせ</button>
+        </div>
+        <div class="hint">×は書かずに数字とxを続けてもOK（例: 5x）。÷は / で入力してください。</div>
+        <div class="feedback" id="fb2"></div>
+      </div>
+
+      <div class="footer-row">
+        <button class="next-btn" id="nextBtn">次の問題へ →</button>
+      </div>
+    </div>
+  `;
+
+  const optionsWrap = document.getElementById('optionsWrap');
+  optionsWrap.querySelectorAll('.option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(chosenOption !== null) return; // already answered
+      const idx = parseInt(btn.dataset.index);
+      chosenOption = idx;
+      const buttons = optionsWrap.querySelectorAll('.option-btn');
+      buttons.forEach(b=>b.disabled = true);
+      const fb1 = document.getElementById('fb1');
+      if(idx === p.correctIndex){
+        btn.classList.add('selected-correct');
+        stepOneCorrect = true;
+        fb1.className = 'feedback show good';
+        fb1.innerHTML = `<span class="expl-title">正解！</span>その通り、「${p.options[p.correctIndex]}」を x とおくと考えやすくなります。`;
+        document.getElementById('step2').classList.remove('locked');
+        document.getElementById('exprInput').focus();
+      }else{
+        btn.classList.add('selected-wrong');
+        buttons[p.correctIndex].classList.add('reveal-correct');
+        fb1.className = 'feedback show bad';
+        fb1.innerHTML = `<span class="expl-title">おしい！</span>正しくは「${p.options[p.correctIndex]}」です。まだ分かっていない量を x とおくのがポイントです。`;
+        document.getElementById('step2').classList.remove('locked');
+        document.getElementById('exprInput').focus();
+      }
+    });
+  });
+
+  document.getElementById('submitExpr').addEventListener('click', checkExpr);
+  document.getElementById('exprInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') checkExpr();
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', ()=>{
+    current++;
+    if(current >= problems.length){
+      showResult();
+    }else{
+      renderProblem();
+    }
+  });
+}
+
+function checkExpr(){
+  const p = problems[current];
+  const input = document.getElementById('exprInput');
+  const val = input.value;
+  if(!val.trim()) return;
+  const submitBtn = document.getElementById('submitExpr');
+  submitBtn.disabled = true;
+  input.disabled = true;
+
+  const correct = isExprEquivalent(val, p.accepted);
+  const fb2 = document.getElementById('fb2');
+
+  if(correct){
+    input.classList.add('right');
+    fb2.className = 'feedback show good';
+    fb2.innerHTML = `<span class="expl-title">正解です！</span>${p.explanation}`;
+    if(stepOneCorrect) score++;
+  }else{
+    input.classList.add('wrong');
+    fb2.className = 'feedback show bad';
+    fb2.innerHTML = `<span class="expl-title">もう一歩！</span>${p.explanation}`;
+  }
+  document.getElementById('nextBtn').classList.add('show');
+  document.getElementById('nextBtn').focus();
+}
+
+function showResult(){
+  const list = activeList();
+  quizArea.innerHTML = '';
+  resultArea.classList.remove('hidden');
+  progressFill.style.width = '100%';
+  progressLabel.textContent = `${list.length} / ${list.length}`;
+  document.getElementById('resultScore').innerHTML = `${score}<span>/${list.length}</span>`;
+  let msg = '';
+  if(mode === 'single'){
+    if(score === list.length) msg = 'パーフェクト！「何を文字でおくか」がしっかり見えています。';
+    else if(score >= list.length*0.6) msg = 'いい調子！まだ分かっていない量に注目する練習を続けよう。';
+    else msg = '「求めたいもの」と「まだ分かっていない量」は違うことがあります。もう一度確認してみよう。';
+  }else{
+    if(score === list.length) msg = 'パーフェクト！2つの文字のおき方も、条件の式化もばっちりです。';
+    else if(score >= list.length*0.6) msg = 'いい調子！条件文を「そのまま」式にする感覚を続けて練習しよう。';
+    else msg = '文章の中の2つの条件を、それぞれ独立した式にすることを意識してみよう。';
+  }
+  document.getElementById('resultMsg').textContent = msg;
+}
+
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  current = 0;
+  score = 0;
+  resultArea.classList.add('hidden');
+  if(mode === 'single') renderProblem(); else renderProblem2();
+});
+
+function renderProblem2(){
+  const p = systemProblems[current];
+  sysStep = 1;
+  sysChosenX = null;
+  sysChosenY = null;
+  sysXYCorrect = false;
+  sysCond1Correct = false;
+  sysOrientation = 'normal';
+  updateProgress();
+
+  quizArea.innerHTML = `
+    <div class="card">
+      <span class="problem-tag">${p.tag}</span>
+      <p class="problem-text">${p.text}</p>
+
+      <div class="step" id="s2step1">
+        <div class="step-label"><span class="step-badge">1</span> x と y をそれぞれ何とするか決めよう</div>
+        <div class="var-groups">
+          <div class="var-group" id="groupX">
+            <div class="var-group-title">x は？</div>
+            <div class="options" id="optionsX">
+              ${p.optionsX.map((opt,i)=>`<button class="option-btn" data-group="x" data-index="${i}"><span>${opt}</span><span class="check-badge">✓</span></button>`).join('')}
+            </div>
+          </div>
+          <div class="var-group" id="groupY">
+            <div class="var-group-title">y は？</div>
+            <div class="options" id="optionsY">
+              ${p.optionsY.map((opt,i)=>`<button class="option-btn" data-group="y" data-index="${i}"><span>${opt}</span><span class="check-badge">✓</span></button>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="hint">選んだものをもう一度タップすると選択を取り消せます。x と y の両方を選ぶと答え合わせされます。</div>
+        <div class="feedback" id="s2fb1"></div>
+      </div>
+
+      <div class="step locked" id="s2step2">
+        <div class="step-label"><span class="step-badge">2</span> 1つ目の条件を式にする</div>
+        <div class="cond-block">${p.cond1Text}</div>
+        <div class="expr-row">
+          <input type="text" class="expr-input" id="s2input1" placeholder="例: 3x+2y=650">
+          <button class="submit-btn" id="s2submit1">答え合わせ</button>
+        </div>
+        <div class="feedback" id="s2fb2"></div>
+      </div>
+
+      <div class="step locked" id="s2step3">
+        <div class="step-label"><span class="step-badge">3</span> 2つ目の条件を式にする</div>
+        <div class="cond-block">${p.cond2Text}</div>
+        <div class="expr-row">
+          <input type="text" class="expr-input" id="s2input2" placeholder="例: 2x+5y=700">
+          <button class="submit-btn" id="s2submit2">答え合わせ</button>
+        </div>
+        <div class="hint">＝ を含めて入力してください。×は省略してOK（例: 3x+2y=650）。</div>
+        <div class="feedback" id="s2fb3"></div>
+      </div>
+
+      <div class="footer-row">
+        <button class="next-btn" id="s2nextBtn">次の問題へ →</button>
+      </div>
+    </div>
+  `;
+
+  function tryEvaluateXY(){
+    if(sysChosenX === null || sysChosenY === null) return;
+    const buttonsX = document.querySelectorAll('#optionsX .option-btn');
+    const buttonsY = document.querySelectorAll('#optionsY .option-btn');
+    buttonsX.forEach(b=>{b.disabled = true; b.classList.remove('picked');});
+    buttonsY.forEach(b=>{b.disabled = true; b.classList.remove('picked');});
+    const fb1 = document.getElementById('s2fb1');
+
+    const exactMatch = sysChosenX === p.correctXIndex && sysChosenY === p.correctYIndex;
+    const swappedMatch = sysChosenX === p.correctYIndex && sysChosenY === p.correctXIndex;
+    sysXYCorrect = exactMatch || swappedMatch;
+    sysOrientation = swappedMatch && !exactMatch ? 'swapped' : 'normal';
+
+    if(sysXYCorrect){
+      // both chosen buttons are a valid pair (possibly swapped) — mark both green
+      buttonsX[sysChosenX].classList.add('selected-correct');
+      buttonsY[sysChosenY].classList.add('selected-correct');
+      fb1.className = 'feedback show good';
+      if(sysOrientation === 'swapped'){
+        fb1.innerHTML = `<span class="expl-title">正解！</span>x = ${p.optionsX[sysChosenX]}、y = ${p.optionsY[sysChosenY]} という置き方ですね。教科書の例とは x と y が逆ですが、2つの未知の量を正しく見分けられているので本質的には同じです。この先の式もあなたの置き方に合わせて確認します。`;
+      }else{
+        fb1.innerHTML = `<span class="expl-title">正解！</span>x = ${p.optionsX[p.correctXIndex]}、y = ${p.optionsY[p.correctYIndex]} とおくと、条件が式にしやすくなります。`;
+      }
+    }else{
+      buttonsX[p.correctXIndex].classList.add('reveal-correct');
+      buttonsY[p.correctYIndex].classList.add('reveal-correct');
+      buttonsX[sysChosenX].classList.add('selected-wrong');
+      buttonsY[sysChosenY].classList.add('selected-wrong');
+      fb1.className = 'feedback show bad';
+      fb1.innerHTML = `<span class="expl-title">おしい！</span>x, y にあたるのは「${p.optionsX[p.correctXIndex]}」と「${p.optionsY[p.correctYIndex]}」です（どちらをxにしてもOK）。分かっていない2つの量に注目しよう。`;
+    }
+    document.getElementById('s2step2').classList.remove('locked');
+    document.getElementById('s2input1').focus();
+  }
+
+  document.querySelectorAll('#optionsX .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = parseInt(btn.dataset.index);
+      const buttons = document.querySelectorAll('#optionsX .option-btn');
+      if(sysChosenX === idx){
+        // cancel this selection
+        sysChosenX = null;
+        buttons.forEach(b=>b.classList.remove('picked'));
+        return;
+      }
+      sysChosenX = idx;
+      buttons.forEach(b=>b.classList.remove('picked'));
+      btn.classList.add('picked');
+      tryEvaluateXY();
+    });
+  });
+  document.querySelectorAll('#optionsY .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = parseInt(btn.dataset.index);
+      const buttons = document.querySelectorAll('#optionsY .option-btn');
+      if(sysChosenY === idx){
+        // cancel this selection
+        sysChosenY = null;
+        buttons.forEach(b=>b.classList.remove('picked'));
+        return;
+      }
+      sysChosenY = idx;
+      buttons.forEach(b=>b.classList.remove('picked'));
+      btn.classList.add('picked');
+      tryEvaluateXY();
+    });
+  });
+
+  document.getElementById('s2submit1').addEventListener('click', ()=>{
+    const input = document.getElementById('s2input1');
+    const val = input.value;
+    if(!val.trim()) return;
+    document.getElementById('s2submit1').disabled = true;
+    input.disabled = true;
+    const accepted1 = acceptedForOrientation(p.cond1Accepted);
+    const correct = isEquationEquivalent(val, accepted1);
+    sysCond1Correct = correct;
+    const fb2 = document.getElementById('s2fb2');
+    if(correct){
+      input.classList.add('right');
+      fb2.className = 'feedback show good';
+      fb2.innerHTML = `<span class="expl-title">正解です！</span>条件がそのまま式になっていますね。`;
+    }else{
+      input.classList.add('wrong');
+      fb2.className = 'feedback show bad';
+      fb2.innerHTML = `<span class="expl-title">もう一歩！</span>正しい式の例: <b>${accepted1[0]}</b>`;
+    }
+    document.getElementById('s2step3').classList.remove('locked');
+    document.getElementById('s2input2').focus();
+  });
+  document.getElementById('s2input1').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') document.getElementById('s2submit1').click();
+  });
+
+  document.getElementById('s2submit2').addEventListener('click', ()=>{
+    const input = document.getElementById('s2input2');
+    const val = input.value;
+    if(!val.trim()) return;
+    document.getElementById('s2submit2').disabled = true;
+    input.disabled = true;
+    const accepted2 = acceptedForOrientation(p.cond2Accepted);
+    const correct = isEquationEquivalent(val, accepted2);
+    const fb3 = document.getElementById('s2fb3');
+    const swapNote = sysOrientation === 'swapped' ? '（あなたの置き方では教科書の例と x, y が逆になっていますが、考え方は同じです）' : '';
+    if(correct){
+      input.classList.add('right');
+      fb3.className = 'feedback show good';
+      fb3.innerHTML = `<span class="expl-title">正解です！</span>${p.explanation}${swapNote}`;
+    }else{
+      input.classList.add('wrong');
+      fb3.className = 'feedback show bad';
+      fb3.innerHTML = `<span class="expl-title">もう一歩！</span>正しい式の例: <b>${accepted2[0]}</b><br>${p.explanation}${swapNote}`;
+    }
+    if(sysXYCorrect && sysCond1Correct && correct) score++;
+    document.getElementById('s2nextBtn').classList.add('show');
+    document.getElementById('s2nextBtn').focus();
+  });
+  document.getElementById('s2input2').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') document.getElementById('s2submit2').click();
+  });
+
+  document.getElementById('s2nextBtn').addEventListener('click', ()=>{
+    current++;
+    if(current >= systemProblems.length){
+      showResult();
+    }else{
+      renderProblem2();
+    }
+  });
+}
+
+renderProblem();
+</script>
+</body>
+</html>
